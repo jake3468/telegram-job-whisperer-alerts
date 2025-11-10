@@ -1194,12 +1194,15 @@ export type Database = {
           design_for_resume: string | null
           id: string
           job_alert_reminder: string | null
+          jobalerts_username: string | null
+          jobapplication_username: string | null
           profile_setup_completed: boolean
           referral_id: string | null
           referred_at: string | null
           resume: string | null
           resume_filename: string | null
           resume_uploaded_at: string | null
+          resume_username: string | null
           show_job_alerts_onboarding_popup: boolean
           show_job_board_onboarding_popup: boolean
           show_job_tracker_onboarding_popup: boolean
@@ -1219,12 +1222,15 @@ export type Database = {
           design_for_resume?: string | null
           id?: string
           job_alert_reminder?: string | null
+          jobalerts_username?: string | null
+          jobapplication_username?: string | null
           profile_setup_completed?: boolean
           referral_id?: string | null
           referred_at?: string | null
           resume?: string | null
           resume_filename?: string | null
           resume_uploaded_at?: string | null
+          resume_username?: string | null
           show_job_alerts_onboarding_popup?: boolean
           show_job_board_onboarding_popup?: boolean
           show_job_tracker_onboarding_popup?: boolean
@@ -1244,12 +1250,15 @@ export type Database = {
           design_for_resume?: string | null
           id?: string
           job_alert_reminder?: string | null
+          jobalerts_username?: string | null
+          jobapplication_username?: string | null
           profile_setup_completed?: boolean
           referral_id?: string | null
           referred_at?: string | null
           resume?: string | null
           resume_filename?: string | null
           resume_uploaded_at?: string | null
+          resume_username?: string | null
           show_job_alerts_onboarding_popup?: boolean
           show_job_board_onboarding_popup?: boolean
           show_job_tracker_onboarding_popup?: boolean
