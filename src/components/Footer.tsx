@@ -129,8 +129,9 @@ const Footer = () => {
               © {new Date().getFullYear()} Aspirely.ai. All rights reserved.
             </p>
             <div className="flex items-center space-x-6">
-              
-              
+              <a href="https://wired.business" target="_blank" rel="noopener noreferrer">
+                <img src="https://wired.business/badge3-white.svg" alt="Featured on Wired Business" width="200" height="54" />
+              </a>
             </div>
           </div>
         </div>
