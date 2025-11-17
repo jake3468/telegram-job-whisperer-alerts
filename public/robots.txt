@@ -1,21 +1,6 @@
 User-agent: *
-Allow: /
 
-# Blog content - encourage crawling
-Allow: /blogs
-Allow: /blog/
-Crawl-delay: 1
-
-# SEO-friendly pages
-Allow: /privacy-policy
-Allow: /terms-of-service
-Allow: /contact-support
-
-# Badge verification content
-Allow: /*badge*
-Allow: /*verification*
-
-# Disallow protected pages that require authentication
+# Disallow protected pages that require authentication (MUST come first)
 Disallow: /job-guide
 Disallow: /cover-letter
 Disallow: /linkedin-posts
@@ -31,12 +16,42 @@ Disallow: /ai-mock-interview
 Disallow: /ai-agents
 Disallow: /job-board
 
+# Blog content - encourage crawling
+Allow: /blogs
+Allow: /blog/
+Crawl-delay: 1
+
+# SEO-friendly pages
+Allow: /privacy-policy
+Allow: /terms-of-service
+Allow: /contact-support
+
+# Badge verification content
+Allow: /*badge*
+Allow: /*verification*
+
 # Sitemap for search engines
-# Contains high-quality, comprehensive career development content
 Sitemap: https://aspirely.ai/sitemap.xml
 
 # Google-specific optimization
 User-agent: Googlebot
+
+# Repeat disallow rules for Googlebot
+Disallow: /job-guide
+Disallow: /cover-letter
+Disallow: /linkedin-posts
+Disallow: /interview-prep
+Disallow: /company-role-analysis
+Disallow: /job-alerts
+Disallow: /get-more-credits
+Disallow: /upgrade
+Disallow: /profile
+Disallow: /dashboard
+Disallow: /job-tracker
+Disallow: /ai-mock-interview
+Disallow: /ai-agents
+Disallow: /job-board
+
 Allow: /blogs
 Allow: /blog/
 Crawl-delay: 1
