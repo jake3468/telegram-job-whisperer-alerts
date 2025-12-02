@@ -108,12 +108,27 @@ export default {
 				'float': {
 					'0%, 100%': { transform: 'translateY(0px)' },
 					'50%': { transform: 'translateY(-4px)' }
+				},
+				'aurora-drift-1': {
+					'0%, 100%': { transform: 'translate(0%, 0%) scale(1)' },
+					'50%': { transform: 'translate(30%, -20%) scale(1.1)' }
+				},
+				'aurora-drift-2': {
+					'0%, 100%': { transform: 'translate(0%, 0%) scale(1)' },
+					'50%': { transform: 'translate(-25%, 25%) scale(0.95)' }
+				},
+				'aurora-drift-3': {
+					'0%, 100%': { transform: 'translate(0%, 0%) scale(1.05)' },
+					'50%': { transform: 'translate(20%, 15%) scale(1)' }
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
-				'float': 'float 3s ease-in-out infinite'
+				'float': 'float 3s ease-in-out infinite',
+				'aurora-drift-1': 'aurora-drift-1 25s ease-in-out infinite',
+				'aurora-drift-2': 'aurora-drift-2 20s ease-in-out infinite',
+				'aurora-drift-3': 'aurora-drift-3 30s ease-in-out infinite'
 			},
 			fontFamily: {
 				'inter': ['Inter', 'system-ui', 'sans-serif'],
