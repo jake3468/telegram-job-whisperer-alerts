@@ -10,7 +10,6 @@ import jobApplicationPreview from '@/assets/job-application-preview.svg';
 import jobAlertsAgentPreview from '@/assets/job-alerts-agent-preview.svg';
 import resumeBuilderAgentPreview from '@/assets/resume-builder-agent-preview.svg';
 import jobSuccessHero from '@/assets/job-success-hero-updated.jpg';
-import { AuroraBackground } from '@/components/ui/aurora-background';
 
 // Add heading animation hook at component level
 const useHeadingAnimation = () => {
@@ -122,11 +121,6 @@ const HeroSection = () => {
   };
   return <>
     <section id="hero-section" className="relative min-h-[80vh] flex items-center justify-center px-4 pt-20 sm:pt-24 pb-2 overflow-hidden bg-background dark:bg-black" aria-labelledby="hero-heading">
-      {/* Aurora wave background */}
-      <div className="absolute inset-0 z-0">
-        <AuroraBackground />
-      </div>
-      
       {/* bg-gradient-hero-mobile md:bg-gradient-hero - commented out for now */}
       <div className="absolute inset-0 z-10 bg-white/20 dark:bg-black/20" aria-hidden="true" />
       
