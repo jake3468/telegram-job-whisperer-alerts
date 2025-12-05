@@ -206,7 +206,7 @@ const Ebook = () => {
                 The Insider's Guide to Getting Rich While 40% of Workers Get Replaced
               </p>
               <p className="text-sm text-muted-foreground mb-6 lg:mb-6">
-                Written by <span className="font-semibold text-foreground">ASPIRELY.AI</span>
+                E-book written by <span className="font-semibold text-foreground">ASPIRELY.AI</span>
               </p>
 
               {/* Price and CTA - Desktop only */}
