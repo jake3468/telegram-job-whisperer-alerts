@@ -60,6 +60,14 @@
     <priority>0.8</priority>
   </url>
   
+  <!-- E-book Page -->
+  <url>
+    <loc>https://aspirely.ai/ebook</loc>
+    <lastmod>2025-12-05</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
   <!-- Legal & Support Pages -->
   <url>
     <loc>https://aspirely.ai/privacy-policy</loc>
