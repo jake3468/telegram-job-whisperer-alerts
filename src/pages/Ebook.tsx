@@ -1,9 +1,29 @@
 import { Helmet } from 'react-helmet-async';
 import AuthHeader from '@/components/AuthHeader';
 import Footer from '@/components/Footer';
-import { BookOpen, CheckCircle, Lightbulb } from 'lucide-react';
+import { BookOpen, CheckCircle, Lightbulb, Mail } from 'lucide-react';
+import { useLocationPricing } from '@/hooks/useLocationPricing';
+import { Button } from '@/components/ui/button';
 
 const Ebook = () => {
+  const { pricingData, isLoading } = useLocationPricing();
+  const isIndian = pricingData?.region === 'IN';
+
+  const ebookPricing = {
+    india: {
+      originalPrice: '₹249',
+      discountedPrice: '₹99',
+      checkoutUrl: 'https://checkout.dodopayments.com/buy/pdt_yJ3exEUxmCaf0PLYIdWWj?quantity=1&redirect_url=https://aspirely.ai%2F'
+    },
+    global: {
+      originalPrice: '$9.99',
+      discountedPrice: '$3.99',
+      checkoutUrl: 'https://checkout.dodopayments.com/buy/pdt_hKlmUz52twLoV4sQnzgkM?quantity=1&redirect_url=https://aspirely.ai%2F'
+    }
+  };
+
+  const currentPricing = isIndian ? ebookPricing.india : ebookPricing.global;
+
   const insideBookPoints = [
     "The 15 roles most at risk of disruption (and how to adapt if yours is on the list)",
     "Practical ChatGPT techniques to enhance your productivity and decision-making",
@@ -13,6 +33,59 @@ const Ebook = () => {
     "Networking approaches that open doors to better opportunities",
     "A 5-year roadmap to position yourself as a leader in your field"
   ];
+
+  const handleBuyNow = () => {
+    window.open(currentPricing.checkoutUrl, '_blank');
+  };
+
+  const PricingSection = () => (
+    <div className="p-6 bg-gradient-to-br from-primary/10 to-primary/5 rounded-lg border border-primary/20">
+      {isLoading ? (
+        <div className="text-center">
+          <div className="animate-pulse text-muted-foreground">Loading pricing...</div>
+        </div>
+      ) : (
+        <div className="text-center">
+          {/* 60% OFF Badge */}
+          <span className="inline-block bg-red-500 text-white text-sm font-bold px-3 py-1 rounded-full mb-3">
+            60% OFF
+          </span>
+          
+          {/* Price Display */}
+          <div className="flex items-center justify-center gap-3 mb-4">
+            {/* Original Price (strikethrough) */}
+            <span className="text-xl text-muted-foreground line-through">
+              {currentPricing.originalPrice}
+            </span>
+            {/* Discounted Price */}
+            <span className="text-3xl font-bold text-foreground">
+              {currentPricing.discountedPrice}
+            </span>
+          </div>
+          
+          {/* Buy Now Button */}
+          <Button
+            onClick={handleBuyNow}
+            className="w-full font-semibold py-3 px-8 text-base"
+            size="lg"
+          >
+            Buy Now
+          </Button>
+          
+          {/* Email Delivery Note */}
+          <div className="mt-4 p-3 bg-muted/50 rounded-md">
+            <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+              <Mail className="w-4 h-4" />
+              <span>Instant PDF download link via email</span>
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              Sent from <span className="font-medium">noreply@dodopayments.com</span> (our payment partner Dodopayments)
+            </p>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-background text-foreground font-inter">
@@ -81,10 +154,8 @@ const Ebook = () => {
               </p>
 
               {/* Price and CTA - Desktop only */}
-              <div className="hidden lg:block p-6 bg-muted/50 rounded-lg border border-border">
-                <p className="text-muted-foreground text-center">
-                  Price and purchase options coming soon
-                </p>
+              <div className="hidden lg:block">
+                <PricingSection />
               </div>
             </div>
 
@@ -99,11 +170,7 @@ const Ebook = () => {
 
             {/* Price and CTA - Mobile/Tablet only (shows below book cover) */}
             <div className="lg:hidden order-3 w-full">
-              <div className="p-6 bg-muted/50 rounded-lg border border-border">
-                <p className="text-muted-foreground text-center">
-                  Price and purchase options coming soon
-                </p>
-              </div>
+              <PricingSection />
             </div>
           </div>
         </section>
