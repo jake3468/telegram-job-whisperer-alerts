@@ -99,21 +99,21 @@ const Ebook = () => {
               <Clock className="w-3 h-3" />
               <span>Offer ends in:</span>
             </div>
-            <div className="flex items-center justify-center gap-3">
+            <div className="flex items-center justify-center gap-2">
               {[{
             value: timeLeft.hours,
-            label: 'Hours'
+            label: 'Hrs'
           }, {
             value: timeLeft.minutes,
-            label: 'Minutes'
+            label: 'Min'
           }, {
             value: timeLeft.seconds,
-            label: 'Seconds'
+            label: 'Sec'
           }].map((item, index) => <div key={index} className="flex flex-col items-center">
-                  <div className="bg-blue-500 text-white px-3 py-2 rounded-lg text-2xl font-bold min-w-[60px] text-center shadow-md">
+                  <div className="bg-blue-500 text-white px-2 py-1 rounded-md text-lg font-bold min-w-[40px] text-center shadow-sm">
                     {String(item.value).padStart(2, '0')}
                   </div>
-                  <span className="text-xs text-muted-foreground mt-1">{item.label}</span>
+                  <span className="text-[10px] text-muted-foreground mt-0.5">{item.label}</span>
                 </div>)}
             </div>
           </div>
@@ -131,7 +131,7 @@ const Ebook = () => {
           </div>
           
           {/* Buy Now Button */}
-          <Button onClick={handleBuyNow} className="w-full font-semibold py-3 px-8 text-base" size="lg">
+          <Button onClick={handleBuyNow} className="w-full font-semibold py-3 px-8 text-base bg-green-500 hover:bg-green-600" size="lg">
             Buy Now
           </Button>
           
