@@ -1,13 +1,48 @@
 import { Helmet } from 'react-helmet-async';
 import AuthHeader from '@/components/AuthHeader';
 import Footer from '@/components/Footer';
-import { BookOpen, CheckCircle, Lightbulb, Mail, Quote } from 'lucide-react';
+import { BookOpen, CheckCircle, Clock, Lightbulb, Mail, Quote } from 'lucide-react';
 import { useLocationPricing } from '@/hooks/useLocationPricing';
 import { Button } from '@/components/ui/button';
+import { useState, useEffect } from 'react';
 
 const Ebook = () => {
   const { pricingData, isLoading } = useLocationPricing();
   const isIndian = pricingData?.region === 'IN';
+
+  // Countdown timer - ends 3 days from user's first visit (stored in localStorage)
+  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+
+  useEffect(() => {
+    const storedEndTime = localStorage.getItem('ebook_offer_end');
+    let endTime: number;
+
+    if (storedEndTime) {
+      endTime = parseInt(storedEndTime, 10);
+    } else {
+      // Set offer to expire in 3 days
+      endTime = Date.now() + 3 * 24 * 60 * 60 * 1000;
+      localStorage.setItem('ebook_offer_end', endTime.toString());
+    }
+
+    const calculateTimeLeft = () => {
+      const difference = endTime - Date.now();
+      if (difference > 0) {
+        setTimeLeft({
+          days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+          hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+          minutes: Math.floor((difference / 1000 / 60) % 60),
+          seconds: Math.floor((difference / 1000) % 60),
+        });
+      } else {
+        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+      }
+    };
+
+    calculateTimeLeft();
+    const timer = setInterval(calculateTimeLeft, 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   const ebookPricing = {
     india: {
@@ -71,6 +106,30 @@ const Ebook = () => {
           <span className="inline-block bg-green-500 text-white text-sm font-bold px-3 py-1 rounded-full mb-3">
             60% OFF
           </span>
+          
+          {/* Countdown Timer */}
+          <div className="mb-4">
+            <div className="flex items-center justify-center gap-1 text-xs text-muted-foreground mb-2">
+              <Clock className="w-3 h-3" />
+              <span>Offer ends in:</span>
+            </div>
+            <div className="flex items-center justify-center gap-2">
+              {[
+                { value: timeLeft.days, label: 'D' },
+                { value: timeLeft.hours, label: 'H' },
+                { value: timeLeft.minutes, label: 'M' },
+                { value: timeLeft.seconds, label: 'S' },
+              ].map((item, index) => (
+                <div key={index} className="flex items-center">
+                  <div className="bg-red-500 text-white px-2 py-1 rounded text-sm font-mono font-bold min-w-[32px]">
+                    {String(item.value).padStart(2, '0')}
+                  </div>
+                  <span className="text-xs text-muted-foreground ml-0.5">{item.label}</span>
+                  {index < 3 && <span className="text-muted-foreground ml-1">:</span>}
+                </div>
+              ))}
+            </div>
+          </div>
           
           {/* Price Display */}
           <div className="flex items-center justify-center gap-3 mb-4">
