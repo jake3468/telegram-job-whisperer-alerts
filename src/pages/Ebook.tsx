@@ -1,7 +1,7 @@
 import { Helmet } from 'react-helmet-async';
 import AuthHeader from '@/components/AuthHeader';
 import Footer from '@/components/Footer';
-import { BookOpen, CheckCircle, Lightbulb, Mail } from 'lucide-react';
+import { BookOpen, CheckCircle, Lightbulb, Mail, Quote } from 'lucide-react';
 import { useLocationPricing } from '@/hooks/useLocationPricing';
 import { Button } from '@/components/ui/button';
 
@@ -32,6 +32,27 @@ const Ebook = () => {
     "Proven ways to build additional income streams that safeguard your future",
     "Networking approaches that open doors to better opportunities",
     "A 5-year roadmap to position yourself as a leader in your field"
+  ];
+
+  const testimonials = [
+    {
+      quote: "This book completely changed how I view my career. The 90-day action plan alone was worth 10x the price. I've already started upskilling and feel more confident about my future.",
+      name: "Priya S.",
+      role: "Marketing Manager",
+      location: "Mumbai"
+    },
+    {
+      quote: "As someone in accounting, I was worried about AI replacing my job. This book gave me practical strategies to become irreplaceable. Highly recommend!",
+      name: "Michael T.",
+      role: "Senior Accountant",
+      location: "London"
+    },
+    {
+      quote: "The chapter on building multiple income streams opened my eyes. I've already implemented two of the strategies and seeing results within weeks.",
+      name: "Sarah K.",
+      role: "Software Developer",
+      location: "San Francisco"
+    }
   ];
 
   const handleBuyNow = () => {
@@ -205,6 +226,32 @@ const Ebook = () => {
                 </li>
               ))}
             </ul>
+          </div>
+        </section>
+
+        {/* Testimonials Section */}
+        <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
+          <div className="text-center mb-8">
+            <h2 className="text-2xl font-bold text-foreground">What Readers Are Saying</h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {testimonials.map((testimonial, index) => (
+              <div 
+                key={index} 
+                className="bg-card border border-border rounded-xl p-6 relative"
+              >
+                <Quote className="w-8 h-8 text-primary/20 absolute top-4 right-4" />
+                <p className="text-foreground text-sm leading-relaxed mb-4 italic">
+                  "{testimonial.quote}"
+                </p>
+                <div className="border-t border-border pt-4">
+                  <p className="font-semibold text-foreground">{testimonial.name}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {testimonial.role}, {testimonial.location}
+                  </p>
+                </div>
+              </div>
+            ))}
           </div>
         </section>
 
