@@ -61,7 +61,7 @@ const Ebook = () => {
 
       <AuthHeader showSectionNav={false} />
 
-      <main className="pt-24 pb-16">
+      <main className="pt-32 lg:pt-36 pb-16">
         {/* Hero Section */}
         <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
@@ -76,12 +76,12 @@ const Ebook = () => {
               <p className="text-base text-muted-foreground mb-4">
                 The Insider's Guide to Getting Rich While 40% of Workers Get Replaced
               </p>
-              <p className="text-sm text-muted-foreground mb-6">
+              <p className="text-sm text-muted-foreground mb-6 lg:mb-6">
                 Written by <span className="font-semibold text-foreground">ASPIRELY.AI</span>
               </p>
 
-              {/* Placeholder for Price and CTA */}
-              <div className="p-6 bg-muted/50 rounded-lg border border-border">
+              {/* Price and CTA - Desktop only */}
+              <div className="hidden lg:block p-6 bg-muted/50 rounded-lg border border-border">
                 <p className="text-muted-foreground text-center">
                   Price and purchase options coming soon
                 </p>
@@ -95,6 +95,15 @@ const Ebook = () => {
                 alt="Jobs That Will Vanish by 2030 - Book Cover"
                 className="rounded-xl shadow-2xl max-w-[280px] lg:max-w-xs w-full"
               />
+            </div>
+
+            {/* Price and CTA - Mobile/Tablet only (shows below book cover) */}
+            <div className="lg:hidden order-3 w-full">
+              <div className="p-6 bg-muted/50 rounded-lg border border-border">
+                <p className="text-muted-foreground text-center">
+                  Price and purchase options coming soon
+                </p>
+              </div>
             </div>
           </div>
         </section>
