@@ -5,18 +5,23 @@ import { BookOpen, CheckCircle, Clock, Lightbulb, Mail, Quote } from 'lucide-rea
 import { useLocationPricing } from '@/hooks/useLocationPricing';
 import { Button } from '@/components/ui/button';
 import { useState, useEffect } from 'react';
-
 const Ebook = () => {
-  const { pricingData, isLoading } = useLocationPricing();
+  const {
+    pricingData,
+    isLoading
+  } = useLocationPricing();
   const isIndian = pricingData?.region === 'IN';
 
   // Countdown timer - ends 3 days from user's first visit (stored in localStorage)
-  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-
+  const [timeLeft, setTimeLeft] = useState({
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0
+  });
   useEffect(() => {
     const storedEndTime = localStorage.getItem('ebook_offer_end');
     let endTime: number;
-
     if (storedEndTime) {
       endTime = parseInt(storedEndTime, 10);
     } else {
@@ -24,26 +29,28 @@ const Ebook = () => {
       endTime = Date.now() + 24 * 60 * 60 * 1000;
       localStorage.setItem('ebook_offer_end', endTime.toString());
     }
-
     const calculateTimeLeft = () => {
       const difference = endTime - Date.now();
       if (difference > 0) {
         setTimeLeft({
           days: Math.floor(difference / (1000 * 60 * 60 * 24)),
-          hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
-          minutes: Math.floor((difference / 1000 / 60) % 60),
-          seconds: Math.floor((difference / 1000) % 60),
+          hours: Math.floor(difference / (1000 * 60 * 60) % 24),
+          minutes: Math.floor(difference / 1000 / 60 % 60),
+          seconds: Math.floor(difference / 1000 % 60)
         });
       } else {
-        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+        setTimeLeft({
+          days: 0,
+          hours: 0,
+          minutes: 0,
+          seconds: 0
+        });
       }
     };
-
     calculateTimeLeft();
     const timer = setInterval(calculateTimeLeft, 1000);
     return () => clearInterval(timer);
   }, []);
-
   const ebookPricing = {
     india: {
       originalPrice: '₹249',
@@ -56,52 +63,31 @@ const Ebook = () => {
       checkoutUrl: 'https://checkout.dodopayments.com/buy/pdt_hKlmUz52twLoV4sQnzgkM?quantity=1&redirect_url=https://aspirely.ai%2F'
     }
   };
-
   const currentPricing = isIndian ? ebookPricing.india : ebookPricing.global;
-
-  const insideBookPoints = [
-    "The 15 roles most at risk of disruption (and how to adapt if yours is on the list)",
-    "Practical ChatGPT techniques to enhance your productivity and decision-making",
-    "High-value skills that companies are actively hiring for today",
-    "A step-by-step 90-day plan to accelerate your career growth",
-    "Proven ways to build additional income streams that safeguard your future",
-    "Networking approaches that open doors to better opportunities",
-    "A 5-year roadmap to position yourself as a leader in your field"
-  ];
-
-  const testimonials = [
-    {
-      quote: "This book completely changed how I view my career. The 90-day action plan alone was worth 10x the price. I've already started upskilling and feel more confident about my future.",
-      name: "Priya S.",
-      role: "Marketing Manager",
-      location: "Mumbai"
-    },
-    {
-      quote: "As someone in accounting, I was worried about AI replacing my job. This book gave me practical strategies to become irreplaceable. Highly recommend!",
-      name: "Michael T.",
-      role: "Senior Accountant",
-      location: "London"
-    },
-    {
-      quote: "The chapter on building multiple income streams opened my eyes. I've already implemented two of the strategies and seeing results within weeks.",
-      name: "Sarah K.",
-      role: "Software Developer",
-      location: "San Francisco"
-    }
-  ];
-
+  const insideBookPoints = ["The 15 roles most at risk of disruption (and how to adapt if yours is on the list)", "Practical ChatGPT techniques to enhance your productivity and decision-making", "High-value skills that companies are actively hiring for today", "A step-by-step 90-day plan to accelerate your career growth", "Proven ways to build additional income streams that safeguard your future", "Networking approaches that open doors to better opportunities", "A 5-year roadmap to position yourself as a leader in your field"];
+  const testimonials = [{
+    quote: "This book completely changed how I view my career. The 90-day action plan alone was worth 10x the price. I've already started upskilling and feel more confident about my future.",
+    name: "Priya S.",
+    role: "Marketing Manager",
+    location: "Mumbai"
+  }, {
+    quote: "As someone in accounting, I was worried about AI replacing my job. This book gave me practical strategies to become irreplaceable. Highly recommend!",
+    name: "Michael T.",
+    role: "Senior Accountant",
+    location: "London"
+  }, {
+    quote: "The chapter on building multiple income streams opened my eyes. I've already implemented two of the strategies and seeing results within weeks.",
+    name: "Sarah K.",
+    role: "Software Developer",
+    location: "San Francisco"
+  }];
   const handleBuyNow = () => {
     window.open(currentPricing.checkoutUrl, '_blank');
   };
-
-  const PricingSection = () => (
-    <div className="p-6 bg-gradient-to-br from-primary/10 to-primary/5 rounded-lg border border-primary/20">
-      {isLoading ? (
-        <div className="text-center">
+  const PricingSection = () => <div className="p-6 bg-gradient-to-br from-primary/10 to-primary/5 rounded-lg border border-primary/20">
+      {isLoading ? <div className="text-center">
           <div className="animate-pulse text-muted-foreground">Loading pricing...</div>
-        </div>
-      ) : (
-        <div className="text-center">
+        </div> : <div className="text-center">
           {/* 60% OFF Badge */}
           <span className="inline-block bg-green-500 text-white text-sm font-bold px-3 py-1 rounded-full mb-3">
             60% OFF
@@ -114,18 +100,21 @@ const Ebook = () => {
               <span>Offer ends in:</span>
             </div>
             <div className="flex items-center justify-center gap-3">
-              {[
-                { value: timeLeft.hours, label: 'Hours' },
-                { value: timeLeft.minutes, label: 'Minutes' },
-                { value: timeLeft.seconds, label: 'Seconds' },
-              ].map((item, index) => (
-                <div key={index} className="flex flex-col items-center">
+              {[{
+            value: timeLeft.hours,
+            label: 'Hours'
+          }, {
+            value: timeLeft.minutes,
+            label: 'Minutes'
+          }, {
+            value: timeLeft.seconds,
+            label: 'Seconds'
+          }].map((item, index) => <div key={index} className="flex flex-col items-center">
                   <div className="bg-blue-500 text-white px-3 py-2 rounded-lg text-2xl font-bold min-w-[60px] text-center shadow-md">
                     {String(item.value).padStart(2, '0')}
                   </div>
                   <span className="text-xs text-muted-foreground mt-1">{item.label}</span>
-                </div>
-              ))}
+                </div>)}
             </div>
           </div>
           
@@ -142,11 +131,7 @@ const Ebook = () => {
           </div>
           
           {/* Buy Now Button */}
-          <Button
-            onClick={handleBuyNow}
-            className="w-full font-semibold py-3 px-8 text-base"
-            size="lg"
-          >
+          <Button onClick={handleBuyNow} className="w-full font-semibold py-3 px-8 text-base" size="lg">
             Buy Now
           </Button>
           
@@ -160,19 +145,12 @@ const Ebook = () => {
               Sent from <span className="font-medium">noreply@dodopayments.com</span> (our payment partner Dodopayments)
             </p>
           </div>
-        </div>
-      )}
-    </div>
-  );
-
-  return (
-    <div className="min-h-screen bg-background text-foreground font-inter">
+        </div>}
+    </div>;
+  return <div className="min-h-screen bg-background text-foreground font-inter">
       <Helmet>
         <title>Jobs That Will Vanish by 2030 - E-book | Aspirely AI</title>
-        <meta 
-          name="description" 
-          content="Future-proof your career in an AI-driven world. Get 8 strategies to save your career before AI takes over. Download the insider's guide now." 
-        />
+        <meta name="description" content="Future-proof your career in an AI-driven world. Get 8 strategies to save your career before AI takes over. Download the insider's guide now." />
         <meta name="keywords" content="AI career guide, jobs automation, future-proof career, AI job displacement, career strategies 2030" />
         <link rel="canonical" href="https://aspirely.ai/ebook-jobs-that-will-vanish-by-2030" />
         
@@ -192,21 +170,21 @@ const Ebook = () => {
         {/* JSON-LD Structured Data */}
         <script type="application/ld+json">
           {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "Book",
-            "name": "JOBS THAT WILL VANISH BY 2030: 8 Strategies to Save Your Career Before AI Takes Over",
-            "author": {
-              "@type": "Organization",
-              "name": "Aspirely AI"
-            },
-            "description": "Future-proof your career in an AI-driven world. The insider's guide to getting rich while 40% of workers get replaced.",
-            "publisher": {
-              "@type": "Organization",
-              "name": "Aspirely AI"
-            },
-            "image": "https://aspirely.ai/lovable-uploads/ebook-cover-jobs-vanish-2030.jpg",
-            "url": "https://aspirely.ai/ebook-jobs-that-will-vanish-by-2030"
-          })}
+          "@context": "https://schema.org",
+          "@type": "Book",
+          "name": "JOBS THAT WILL VANISH BY 2030: 8 Strategies to Save Your Career Before AI Takes Over",
+          "author": {
+            "@type": "Organization",
+            "name": "Aspirely AI"
+          },
+          "description": "Future-proof your career in an AI-driven world. The insider's guide to getting rich while 40% of workers get replaced.",
+          "publisher": {
+            "@type": "Organization",
+            "name": "Aspirely AI"
+          },
+          "image": "https://aspirely.ai/lovable-uploads/ebook-cover-jobs-vanish-2030.jpg",
+          "url": "https://aspirely.ai/ebook-jobs-that-will-vanish-by-2030"
+        })}
         </script>
       </Helmet>
 
@@ -239,11 +217,7 @@ const Ebook = () => {
 
             {/* Book Cover - Shows second on mobile/tablet */}
             <div className="flex justify-center order-2 lg:order-1">
-              <img
-                src="/lovable-uploads/ebook-cover-jobs-vanish-2030.jpg"
-                alt="Jobs That Will Vanish by 2030 - Book Cover"
-                className="rounded-xl shadow-2xl max-w-[280px] lg:max-w-xs w-full"
-              />
+              <img src="/lovable-uploads/ebook-cover-jobs-vanish-2030.jpg" alt="Jobs That Will Vanish by 2030 - Book Cover" className="rounded-xl shadow-2xl max-w-[280px] lg:max-w-xs w-full" />
             </div>
 
             {/* Price and CTA - Mobile/Tablet only (shows below book cover) */}
@@ -270,18 +244,16 @@ const Ebook = () => {
 
         {/* Inside the Book Section */}
         <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
-          <div className="bg-blue-50/50 dark:bg-blue-950/20 border border-blue-200/50 dark:border-blue-800/30 rounded-2xl p-8">
+          <div className="border border-blue-200/50 dark:border-blue-800/30 rounded-2xl p-8 bg-green-200">
             <div className="flex items-center gap-3 mb-6">
               <BookOpen className="w-8 h-8 text-primary" />
               <h2 className="text-2xl font-bold text-foreground">Inside You'll Discover</h2>
             </div>
             <ul className="space-y-4">
-              {insideBookPoints.map((point, index) => (
-                <li key={index} className="flex items-start gap-3">
+              {insideBookPoints.map((point, index) => <li key={index} className="flex items-start gap-3">
                   <CheckCircle className="w-5 h-5 text-primary mt-1 flex-shrink-0" />
                   <span className="text-foreground">{point}</span>
-                </li>
-              ))}
+                </li>)}
             </ul>
           </div>
         </section>
@@ -292,11 +264,7 @@ const Ebook = () => {
             <h2 className="text-2xl font-bold text-foreground">What Readers Are Saying</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {testimonials.map((testimonial, index) => (
-              <div 
-                key={index} 
-                className="bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200/50 dark:border-amber-800/30 rounded-xl p-6"
-              >
+            {testimonials.map((testimonial, index) => <div key={index} className="bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200/50 dark:border-amber-800/30 rounded-xl p-6">
                 <Quote className="w-6 h-6 text-primary/40 mb-3" />
                 <p className="text-foreground text-sm leading-relaxed mb-4 italic">
                   "{testimonial.quote}"
@@ -307,8 +275,7 @@ const Ebook = () => {
                     {testimonial.role}, {testimonial.location}
                   </p>
                 </div>
-              </div>
-            ))}
+              </div>)}
           </div>
         </section>
 
@@ -334,8 +301,6 @@ const Ebook = () => {
       </main>
 
       <Footer />
-    </div>
-  );
+    </div>;
 };
-
 export default Ebook;
