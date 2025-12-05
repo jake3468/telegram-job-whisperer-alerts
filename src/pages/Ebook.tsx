@@ -20,8 +20,8 @@ const Ebook = () => {
     if (storedEndTime) {
       endTime = parseInt(storedEndTime, 10);
     } else {
-      // Set offer to expire in 3 days
-      endTime = Date.now() + 3 * 24 * 60 * 60 * 1000;
+      // Set offer to expire in 24 hours
+      endTime = Date.now() + 24 * 60 * 60 * 1000;
       localStorage.setItem('ebook_offer_end', endTime.toString());
     }
 
@@ -113,19 +113,17 @@ const Ebook = () => {
               <Clock className="w-3 h-3" />
               <span>Offer ends in:</span>
             </div>
-            <div className="flex items-center justify-center gap-2">
+            <div className="flex items-center justify-center gap-3">
               {[
-                { value: timeLeft.days, label: 'D' },
-                { value: timeLeft.hours, label: 'H' },
-                { value: timeLeft.minutes, label: 'M' },
-                { value: timeLeft.seconds, label: 'S' },
+                { value: timeLeft.hours, label: 'Hours' },
+                { value: timeLeft.minutes, label: 'Minutes' },
+                { value: timeLeft.seconds, label: 'Seconds' },
               ].map((item, index) => (
-                <div key={index} className="flex items-center">
-                  <div className="bg-red-500 text-white px-2 py-1 rounded text-sm font-mono font-bold min-w-[32px]">
+                <div key={index} className="flex flex-col items-center">
+                  <div className="bg-blue-500 text-white px-3 py-2 rounded-lg text-2xl font-bold min-w-[60px] text-center shadow-md">
                     {String(item.value).padStart(2, '0')}
                   </div>
-                  <span className="text-xs text-muted-foreground ml-0.5">{item.label}</span>
-                  {index < 3 && <span className="text-muted-foreground ml-1">:</span>}
+                  <span className="text-xs text-muted-foreground mt-1">{item.label}</span>
                 </div>
               ))}
             </div>
