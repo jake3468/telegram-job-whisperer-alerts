@@ -64,28 +64,19 @@ const Ebook = () => {
       <main className="pt-24 pb-16">
         {/* Hero Section */}
         <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            {/* Book Cover */}
-            <div className="flex justify-center lg:justify-start">
-              <img
-                src="/lovable-uploads/ebook-cover-jobs-vanish-2030.jpg"
-                alt="Jobs That Will Vanish by 2030 - Book Cover"
-                className="rounded-xl shadow-2xl max-w-sm w-full"
-              />
-            </div>
-
-            {/* Title and Intro */}
-            <div className="text-center lg:text-left">
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground leading-tight mb-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+            {/* Title and Intro - Shows first on mobile/tablet */}
+            <div className="text-center lg:text-left order-1 lg:order-2">
+              <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-foreground leading-tight mb-3">
                 JOBS THAT WILL VANISH BY 2030
               </h1>
-              <p className="text-xl md:text-2xl text-primary font-semibold mb-4">
+              <p className="text-lg md:text-xl text-primary font-semibold mb-3">
                 8 Strategies to Save Your Career Before AI Takes Over
               </p>
-              <p className="text-lg text-muted-foreground mb-6">
+              <p className="text-base text-muted-foreground mb-4">
                 The Insider's Guide to Getting Rich While 40% of Workers Get Replaced
               </p>
-              <p className="text-sm text-muted-foreground mb-8">
+              <p className="text-sm text-muted-foreground mb-6">
                 Written by <span className="font-semibold text-foreground">ASPIRELY.AI</span>
               </p>
 
@@ -95,6 +86,15 @@ const Ebook = () => {
                   Price and purchase options coming soon
                 </p>
               </div>
+            </div>
+
+            {/* Book Cover - Shows second on mobile/tablet */}
+            <div className="flex justify-center order-2 lg:order-1">
+              <img
+                src="/lovable-uploads/ebook-cover-jobs-vanish-2030.jpg"
+                alt="Jobs That Will Vanish by 2030 - Book Cover"
+                className="rounded-xl shadow-2xl max-w-[280px] lg:max-w-xs w-full"
+              />
             </div>
           </div>
         </section>
