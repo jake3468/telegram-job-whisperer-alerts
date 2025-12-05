@@ -26,8 +26,8 @@ const Ebook = () => {
     if (storedEndTime) {
       endTime = parseInt(storedEndTime, 10);
     } else {
-      // Set offer to expire in 24 hours
-      endTime = Date.now() + 24 * 60 * 60 * 1000;
+      // Set offer to expire in 10 minutes
+      endTime = Date.now() + 10 * 60 * 1000;
       localStorage.setItem('ebook_offer_end', endTime.toString());
     }
     const calculateTimeLeft = () => {
