@@ -219,6 +219,35 @@ const Ebook = () => {
             {/* Book Cover - Shows second on mobile/tablet */}
             <div className="flex flex-col items-center order-2 lg:order-1">
               <img src="/lovable-uploads/ebook-cover-jobs-vanish-2030.jpg" alt="Jobs That Will Vanish by 2030 - Book Cover" className="rounded-xl shadow-2xl max-w-[280px] lg:max-w-xs w-full" />
+              
+              {/* Star Rating */}
+              <div className="flex items-center gap-2 mt-3">
+                <div className="flex items-center">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <svg
+                      key={star}
+                      className={`w-5 h-5 ${star <= 4 ? 'text-yellow-400' : star === 5 ? 'text-yellow-400' : 'text-muted'}`}
+                      fill={star <= 4 ? 'currentColor' : star === 5 ? 'currentColor' : 'none'}
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={star === 5 ? 0 : 0}
+                    >
+                      {star <= 4 ? (
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                      ) : (
+                        <path
+                          d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                          fill="currentColor"
+                          style={{ clipPath: 'inset(0 30% 0 0)' }}
+                        />
+                      )}
+                    </svg>
+                  ))}
+                </div>
+                <span className="text-sm font-semibold text-foreground">4.7</span>
+                <span className="text-sm text-muted-foreground">(134+ ratings)</span>
+              </div>
+              
               <EbookPreviewGallery />
             </div>
 
