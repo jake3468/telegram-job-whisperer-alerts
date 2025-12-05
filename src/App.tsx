@@ -35,6 +35,7 @@ import ContactSupport from "./pages/ContactSupport";
 import Blogs from "./pages/Blogs";
 import BlogPost from "./pages/BlogPost";
 import AIAgents from "./pages/AIAgents";
+import Ebook from "./pages/Ebook";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -72,6 +73,7 @@ const AppWithSync = () => {
         <Route path="/cookie-policy" element={<CookiePolicy />} />
         <Route path="/terms-of-service" element={<TermsOfService />} />
         <Route path="/contact-support" element={<ContactSupport />} />
+        <Route path="/ebook-jobs-that-will-vanish-by-2030" element={<Ebook />} />
         
         {/* Protected Routes */}
         <Route path="/dashboard" element={<Navigate to="/ai-agents" replace />} />
