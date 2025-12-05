@@ -73,7 +73,7 @@ const AppWithSync = () => {
         <Route path="/cookie-policy" element={<CookiePolicy />} />
         <Route path="/terms-of-service" element={<TermsOfService />} />
         <Route path="/contact-support" element={<ContactSupport />} />
-        <Route path="/ebook" element={<Ebook />} />
+        <Route path="/ebook-jobs-that-will-vanish-by-2030" element={<Ebook />} />
         
         {/* Protected Routes */}
         <Route path="/dashboard" element={<Navigate to="/ai-agents" replace />} />

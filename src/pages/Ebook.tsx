@@ -1,7 +1,7 @@
 import { Helmet } from 'react-helmet-async';
 import AuthHeader from '@/components/AuthHeader';
 import Footer from '@/components/Footer';
-import { BookOpen, CheckCircle, Gift, Lightbulb } from 'lucide-react';
+import { BookOpen, CheckCircle, Lightbulb } from 'lucide-react';
 
 const Ebook = () => {
   const insideBookPoints = [
@@ -23,12 +23,12 @@ const Ebook = () => {
           content="Future-proof your career in an AI-driven world. Get 8 strategies to save your career before AI takes over. Download the insider's guide now." 
         />
         <meta name="keywords" content="AI career guide, jobs automation, future-proof career, AI job displacement, career strategies 2030" />
-        <link rel="canonical" href="https://aspirely.ai/ebook" />
+        <link rel="canonical" href="https://aspirely.ai/ebook-jobs-that-will-vanish-by-2030" />
         
         {/* Open Graph */}
         <meta property="og:title" content="Jobs That Will Vanish by 2030 - E-book | Aspirely AI" />
         <meta property="og:description" content="Future-proof your career in an AI-driven world. Get 8 strategies to save your career before AI takes over." />
-        <meta property="og:url" content="https://aspirely.ai/ebook" />
+        <meta property="og:url" content="https://aspirely.ai/ebook-jobs-that-will-vanish-by-2030" />
         <meta property="og:type" content="product" />
         <meta property="og:image" content="https://aspirely.ai/lovable-uploads/ebook-cover-jobs-vanish-2030.jpg" />
         
@@ -54,7 +54,7 @@ const Ebook = () => {
               "name": "Aspirely AI"
             },
             "image": "https://aspirely.ai/lovable-uploads/ebook-cover-jobs-vanish-2030.jpg",
-            "url": "https://aspirely.ai/ebook"
+            "url": "https://aspirely.ai/ebook-jobs-that-will-vanish-by-2030"
           })}
         </script>
       </Helmet>
@@ -141,19 +141,6 @@ const Ebook = () => {
             </div>
             <p className="text-foreground leading-relaxed">
               Unlike generic career guides, this book is built around current workplace trends and real-world case studies. Every strategy is designed to help you not only protect your career but also thrive in the AI-driven economy.
-            </p>
-          </div>
-        </section>
-
-        {/* Bonus Section */}
-        <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
-          <div className="bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/30 rounded-2xl p-8">
-            <div className="flex items-center gap-3 mb-4">
-              <Gift className="w-8 h-8 text-primary" />
-              <h2 className="text-2xl font-bold text-foreground">Bonus for Readers</h2>
-            </div>
-            <p className="text-foreground leading-relaxed">
-              You'll also receive a <span className="font-bold text-primary">50% discount code</span> for all Aspirely.ai purchases, a fast-growing platform designed to help job seekers with AI-powered job alerts, resume tools, and career insights.
             </p>
           </div>
         </section>

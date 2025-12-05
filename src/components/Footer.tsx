@@ -86,7 +86,7 @@ const Footer = () => {
               <button onClick={() => scrollToSection('pricing')} className="block text-foreground hover:text-primary transition-colors duration-200 text-base font-inter">
                 Pricing
               </button>
-              <Link to="/ebook" className="block text-foreground hover:text-primary transition-colors duration-200 text-base font-inter">
+              <Link to="/ebook-jobs-that-will-vanish-by-2030" className="block text-foreground hover:text-primary transition-colors duration-200 text-base font-inter" onClick={() => window.scrollTo(0, 0)}>
                 Get E-book
               </Link>
             </div>
