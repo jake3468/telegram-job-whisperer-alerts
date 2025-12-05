@@ -2,6 +2,7 @@ import { Helmet } from 'react-helmet-async';
 import AuthHeader from '@/components/AuthHeader';
 import Footer from '@/components/Footer';
 import { BookOpen, CheckCircle, Clock, Lightbulb, Mail, Quote } from 'lucide-react';
+import EbookPreviewGallery from '@/components/EbookPreviewGallery';
 import { useLocationPricing } from '@/hooks/useLocationPricing';
 import { Button } from '@/components/ui/button';
 import { useState, useEffect } from 'react';
@@ -216,8 +217,9 @@ const Ebook = () => {
             </div>
 
             {/* Book Cover - Shows second on mobile/tablet */}
-            <div className="flex justify-center order-2 lg:order-1">
+            <div className="flex flex-col items-center order-2 lg:order-1">
               <img src="/lovable-uploads/ebook-cover-jobs-vanish-2030.jpg" alt="Jobs That Will Vanish by 2030 - Book Cover" className="rounded-xl shadow-2xl max-w-[280px] lg:max-w-xs w-full" />
+              <EbookPreviewGallery />
             </div>
 
             {/* Price and CTA - Mobile/Tablet only (shows below book cover) */}
