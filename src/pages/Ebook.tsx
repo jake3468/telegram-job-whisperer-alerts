@@ -68,7 +68,7 @@ const Ebook = () => {
       ) : (
         <div className="text-center">
           {/* 60% OFF Badge */}
-          <span className="inline-block bg-red-500 text-white text-sm font-bold px-3 py-1 rounded-full mb-3">
+          <span className="inline-block bg-green-500 text-white text-sm font-bold px-3 py-1 rounded-full mb-3">
             60% OFF
           </span>
           
@@ -95,11 +95,11 @@ const Ebook = () => {
           
           {/* Email Delivery Note */}
           <div className="mt-4 p-3 bg-muted/50 rounded-md">
-            <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-              <Mail className="w-4 h-4" />
+            <div className="flex items-center justify-start md:justify-center gap-2 text-sm text-muted-foreground">
+              <Mail className="w-4 h-4 flex-shrink-0" />
               <span>Instant PDF download link via email</span>
             </div>
-            <p className="text-xs text-muted-foreground mt-1">
+            <p className="text-xs text-muted-foreground mt-1 text-left md:text-center">
               Sent from <span className="font-medium">noreply@dodopayments.com</span> (our payment partner Dodopayments)
             </p>
           </div>
@@ -213,7 +213,7 @@ const Ebook = () => {
 
         {/* Inside the Book Section */}
         <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
-          <div className="bg-card border border-border rounded-2xl p-8">
+          <div className="bg-blue-50/50 dark:bg-blue-950/20 border border-blue-200/50 dark:border-blue-800/30 rounded-2xl p-8">
             <div className="flex items-center gap-3 mb-6">
               <BookOpen className="w-8 h-8 text-primary" />
               <h2 className="text-2xl font-bold text-foreground">Inside You'll Discover</h2>
@@ -238,13 +238,13 @@ const Ebook = () => {
             {testimonials.map((testimonial, index) => (
               <div 
                 key={index} 
-                className="bg-card border border-border rounded-xl p-6 relative"
+                className="bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200/50 dark:border-amber-800/30 rounded-xl p-6"
               >
-                <Quote className="w-8 h-8 text-primary/20 absolute top-4 right-4" />
+                <Quote className="w-6 h-6 text-primary/40 mb-3" />
                 <p className="text-foreground text-sm leading-relaxed mb-4 italic">
                   "{testimonial.quote}"
                 </p>
-                <div className="border-t border-border pt-4">
+                <div className="border-t border-amber-200/50 dark:border-amber-800/30 pt-4">
                   <p className="font-semibold text-foreground">{testimonial.name}</p>
                   <p className="text-sm text-muted-foreground">
                     {testimonial.role}, {testimonial.location}
@@ -257,7 +257,7 @@ const Ebook = () => {
 
         {/* Why This Book Matters Section */}
         <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
-          <div className="bg-primary/5 border border-primary/20 rounded-2xl p-8">
+          <div className="bg-green-50/50 dark:bg-green-950/20 border border-green-200/50 dark:border-green-800/30 rounded-2xl p-8">
             <div className="flex items-center gap-3 mb-4">
               <Lightbulb className="w-8 h-8 text-primary" />
               <h2 className="text-2xl font-bold text-foreground">Why This Book Matters</h2>
